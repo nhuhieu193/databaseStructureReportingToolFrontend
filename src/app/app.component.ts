@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { MetadataListComponent } from './metadata/metadata-list.component';
 
 @Component({
+  standalone: true,
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [MetadataListComponent],
+  template: `<app-metadata-list></app-metadata-list>`
 })
-export class AppComponent {
-  title = 'reportingToolFrontend';
-}
+export class AppComponent {}
