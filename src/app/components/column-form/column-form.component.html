@@ -1,0 +1,99 @@
+<!-- src/app/components/column-form/column-form.component.html -->
+<div class="form-container">
+  <h3>{{ isEditing ? 'Edit Column' : 'Add New Column' }}</h3>
+  <p class="table-name">Table: {{ tableName }}</p>
+
+  <form [formGroup]="columnForm" (ngSubmit)="onSubmit()">
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div class="form-row">
+      <!-- Column Name -->
+      <div class="form-group">
+        <label for="columnName">Column Name *</label>
+        <input
+          type="text"
+          id="columnName"
+          formControlName="columnName"
+          class="form-control"
+          [class.error]="getFieldError('columnName')"
+          placeholder="Enter column name">
+        <div *ngIf="getFieldError('columnName')" class="error-message">
+          {{ getFieldError('columnName') }}
+        </div>
+      </div>
+
+      <!-- Data Type -->
+      <div class="form-group">
+        <label for="dataType">Data Type *</label>
+        <select
+          id="dataType"
+          formControlName="dataType"
+          class="form-control"
+          (change)="onDataTypeChange()">
+          <option *ngFor="let type of dataTypes" [value]="type">
+            {{ type }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- Column Size -->
+      <div class="form-group">
+        <label for="columnSize">
+          Size
+          <span *ngIf="needsSize(columnForm.get('dataType')?.value)">*</span>
+        </label>
+        <input
+          type="number"
+          id="columnSize"
+          formControlName="columnSize"
+          class="form-control"
+          placeholder="Enter size"
+          min="1">
+        <div class="help-text">
+          <span *ngIf="columnForm.get('dataType')?.value === 'VARCHAR'">
+            Recommended: 255 for short text, 1000+ for longer text
+          </span>
+          <span *ngIf="columnForm.get('dataType')?.value === 'DECIMAL'">
+            Total number of digits (precision)
+          </span>
+        </div>
+      </div>
+
+      <!-- Nullable -->
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            formControlName="nullable"
+            class="checkbox">
+          Allow NULL values
+        </label>
+        <div class="help-text">
+          Check if this column can contain NULL values
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!columnForm.valid || loading">
+        <span *ngIf="loading">{{ isEditing ? 'Updating...' : 'Creating...' }}</span>
+        <span *ngIf="!loading">{{ isEditing ? 'Update' : 'Create' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

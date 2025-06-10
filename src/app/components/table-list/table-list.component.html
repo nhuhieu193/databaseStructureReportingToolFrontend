@@ -1,0 +1,73 @@
+<!-- src/app/components/table-list/table-list.component.html -->
+<div class="container">
+  <div class="header">
+    <h2>Database Tables</h2>
+    <div class="header-actions">
+      <button
+        class="btn btn-primary"
+        (click)="syncMetadata()"
+        [disabled]="syncing">
+        <span *ngIf="syncing">Syncing...</span>
+        <span *ngIf="!syncing">Sync Metadata</span>
+      </button>
+      <button
+        class="btn btn-success"
+        (click)="showAddTableForm()">
+        Add Table
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    Loading tables...
+  </div>
+
+  <!-- Add Table Form -->
+  <div *ngIf="showAddForm" class="form-section">
+    <app-table-form
+      (saved)="onTableSaved()"
+      (cancelled)="hideAddForm()">
+    </app-table-form>
+  </div>
+
+  <!-- Tables List -->
+  <div *ngIf="!loading && !showAddForm" class="tables-grid">
+    <div class="tables-list">
+      <h3>Tables ({{ tables.length }})</h3>
+      <div class="table-items">
+        <div
+          *ngFor="let table of tables"
+          class="table-item"
+          [class.selected]="selectedTable?.tableName === table.tableName"
+          (click)="selectTable(table)">
+          <div class="table-info">
+            <h4>{{ table.tableName }}</h4>
+            <p class="schema">Schema: {{ table.schemaName }}</p>
+            <p class="description" *ngIf="table.description">{{ table.description }}</p>
+          </div>
+          <div class="table-actions">
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="deleteTable(table.tableName); $event.stopPropagation()">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Details -->
+    <div class="table-details" *ngIf="selectedTable">
+      <app-table-details
+        [table]="selectedTable"
+        (tableUpdated)="loadTables()">
+      </app-table-details>
+    </div>
+  </div>
+</div>

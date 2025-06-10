@@ -1,0 +1,82 @@
+<!-- src/app/components/table-details/table-details.component.html -->
+<div class="table-details-container">
+  <div class="table-header">
+    <div class="table-info">
+      <h3>{{ table.tableName }}</h3>
+      <p class="schema">Schema: {{ table.schemaName }}</p>
+      <p class="description" *ngIf="table.description">{{ table.description }}</p>
+    </div>
+    <button
+      class="btn btn-success btn-sm"
+      (click)="showAddColumn()">
+      Add Column
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Add/Edit Column Form -->
+  <div *ngIf="showAddColumnForm" class="form-section">
+    <app-column-form
+      [column]="editingColumn"
+      [tableName]="table.tableName"
+      (saved)="onColumnSaved()"
+      (cancelled)="hideColumnForm()">
+    </app-column-form>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    Loading columns...
+  </div>
+
+  <!-- Columns List -->
+  <div *ngIf="!loading && !showAddColumnForm" class="columns-section">
+    <h4>Columns ({{ columns.length }})</h4>
+
+    <div *ngIf="columns.length === 0" class="no-columns">
+      No columns found. Click "Add Column" to create the first column.
+    </div>
+
+    <div *ngIf="columns.length > 0" class="columns-table">
+      <div class="table-header-row">
+        <div class="col-name">Column Name</div>
+        <div class="col-type">Data Type</div>
+        <div class="col-size">Size</div>
+        <div class="col-nullable">Nullable</div>
+        <div class="col-actions">Actions</div>
+      </div>
+
+      <div
+        *ngFor="let column of columns"
+        class="table-row">
+        <div class="col-name">
+          <span class="type-icon">{{ getDataTypeIcon(column.dataType) }}</span>
+          {{ column.columnName }}
+        </div>
+        <div class="col-type">{{ column.dataType }}</div>
+        <div class="col-size">{{ column.columnSize || '-' }}</div>
+        <div class="col-nullable">
+          <span class="nullable-badge" [class.nullable]="column.nullable">
+            {{ column.nullable ? 'Yes' : 'No' }}
+          </span>
+        </div>
+        <div class="col-actions">
+          <button
+            class="btn btn-sm btn-secondary"
+            (click)="editColumn(column)">
+            Edit
+          </button>
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="deleteColumn(column.id!)">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<div *ngIf="table">
+  <h3>Columns of {{ table.tableName }}</h3>
+  <table>
+    <tr>
+      <th>Name</th><th>Type</th><th>Size</th><th>Nullable</th><th>Actions</th>
+    </tr>
+    <tr *ngFor="let col of columns">
+      <td>{{ col.columnName }}</td>
+      <td>{{ col.dataType }}</td>
+      <td>{{ col.columnSize }}</td>
+      <td>{{ col.nullable ? 'Yes' : 'No' }}</td>
+      <td><button (click)="deleteColumn(col.id)">🗑</button></td>
+    </tr>
+    <tr>
+      <td><input [(ngModel)]="newCol.columnName" /></td>
+      <td><input [(ngModel)]="newCol.dataType" /></td>
+      <td><input type="number" [(ngModel)]="newCol.columnSize" /></td>
+      <td><input type="checkbox" [(ngModel)]="newCol.nullable" /></td>
+      <td><button (click)="addColumn()">Add</button></td>
+    </tr>
+  </table>
+</div>

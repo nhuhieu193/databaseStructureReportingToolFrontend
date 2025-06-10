@@ -1,1 +1,4 @@
-<app-dashboard></app-dashboard>
+<div class="layout">
+  <app-table-list (select)="selectedTable = $event"></app-table-list>
+  <app-column-list [table]="selectedTable"></app-column-list>
+</div>

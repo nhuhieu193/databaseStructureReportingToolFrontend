@@ -1,0 +1,70 @@
+<!-- src/app/components/table-form/table-form.component.html -->
+<div class="form-container">
+  <h3>{{ isEditing ? 'Edit Table' : 'Add New Table' }}</h3>
+
+  <form [formGroup]="tableForm" (ngSubmit)="onSubmit()">
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <!-- Table Name -->
+    <div class="form-group">
+      <label for="tableName">Table Name *</label>
+      <input
+        type="text"
+        id="tableName"
+        formControlName="tableName"
+        class="form-control"
+        [class.error]="getFieldError('tableName')"
+        placeholder="Enter table name">
+      <div *ngIf="getFieldError('tableName')" class="error-message">
+        {{ getFieldError('tableName') }}
+      </div>
+    </div>
+
+    <!-- Schema Name -->
+    <div class="form-group">
+      <label for="schemaName">Schema Name *</label>
+      <input
+        type="text"
+        id="schemaName"
+        formControlName="schemaName"
+        class="form-control"
+        [class.error]="getFieldError('schemaName')"
+        placeholder="Enter schema name">
+      <div *ngIf="getFieldError('schemaName')" class="error-message">
+        {{ getFieldError('schemaName') }}
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        class="form-control"
+        rows="3"
+        placeholder="Enter table description (optional)">
+      </textarea>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!tableForm.valid || loading">
+        <span *ngIf="loading">{{ isEditing ? 'Updating...' : 'Creating...' }}</span>
+        <span *ngIf="!loading">{{ isEditing ? 'Update' : 'Create' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

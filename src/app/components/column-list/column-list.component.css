@@ -1,0 +1,14 @@
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #eee;
+  padding: 6px 10px;
+}
+
+input[type="text"], input[type="number"] {
+  width: 100px;
+}
