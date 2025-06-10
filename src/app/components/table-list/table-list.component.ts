@@ -1,10 +1,22 @@
+// src/app/components/table-list/table-list.component.ts
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { TableMetadata } from '../../models/table-metadata.model';
 import { TableMetadataService } from '../../services/table-metadata.service';
 import { MetadataSyncService } from '../../services/metadata-sync.service';
+import { TableFormComponent } from '../table-form/table-form.component';
+import { TableDetailsComponent } from '../table-details/table-details.component';
 
 @Component({
   selector: 'app-table-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    TableFormComponent,
+    TableDetailsComponent
+  ],
   templateUrl: './table-list.component.html',
   styleUrls: ['./table-list.component.css']
 })

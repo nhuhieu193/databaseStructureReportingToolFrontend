@@ -1,11 +1,17 @@
 // src/app/components/column-form/column-form.component.ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ColumnMetadata } from '../../models/column-metadata.model';
 import { ColumnMetadataService } from '../../services/column-metadata.service';
 
 @Component({
   selector: 'app-column-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule
+  ],
   templateUrl: './column-form.component.html',
   styleUrls: ['./column-form.component.css']
 })

@@ -1,11 +1,14 @@
 // src/app/components/table-form/table-form.component.ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TableMetadata } from '../../models/table-metadata.model';
 import { TableMetadataService } from '../../services/table-metadata.service';
 
 @Component({
   selector: 'app-table-form',
+  standalone: true, // ✅ Thêm standalone: true
+  imports: [CommonModule, ReactiveFormsModule], // ✅ Thêm imports với ReactiveFormsModule
   templateUrl: './table-form.component.html',
   styleUrls: ['./table-form.component.css']
 })

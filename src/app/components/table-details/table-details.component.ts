@@ -1,11 +1,15 @@
 // src/app/components/table-details/table-details.component.ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { TableMetadata } from '../../models/table-metadata.model';
 import { ColumnMetadata } from '../../models/column-metadata.model';
 import { ColumnMetadataService } from '../../services/column-metadata.service';
+import { ColumnFormComponent } from '../column-form/column-form.component';
 
 @Component({
   selector: 'app-table-details',
+  standalone: true,
+  imports: [CommonModule, ColumnFormComponent],
   templateUrl: './table-details.component.html',
   styleUrls: ['./table-details.component.css']
 })

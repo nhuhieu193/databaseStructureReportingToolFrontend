@@ -1,8 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ColumnMetadata, TableMetadata } from '../../models/metadata.model';
-import { TableMetadataServiceTs } from '../../services/table-metadata.service.ts';
+import { ColumnMetadata } from '../../models/column-metadata.model';
+import { TableMetadata } from '../../models/table-metadata.model';
+import { ColumnMetadataService } from '../../services/column-metadata.service'; // ✅ Import đúng service
 
 @Component({
   selector: 'app-column-list',
@@ -16,7 +17,6 @@ export class ColumnListComponent implements OnChanges {
 
   columns: ColumnMetadata[] = [];
 
-  // ✅ Fix: table phải có kiểu { tableName: string }
   newCol: ColumnMetadata = {
     columnName: '',
     dataType: '',
@@ -25,23 +25,23 @@ export class ColumnListComponent implements OnChanges {
     table: { tableName: '' }
   };
 
-  constructor(private service: TableMetadataServiceTs) {}
+  constructor(private service: ColumnMetadataService) {} // ✅ Inject đúng service
 
   ngOnChanges(): void {
     if (this.table?.tableName) {
-      this.service.getColumns(this.table.tableName).subscribe(res => this.columns = res);
+      // ✅ Sử dụng method đúng tên
+      this.service.getColumnsByTable(this.table.tableName).subscribe(res => this.columns = res);
     }
   }
 
   addColumn(): void {
     if (!this.table?.tableName || !this.newCol.columnName.trim()) return;
 
-    // ✅ Gán đúng table reference
     this.newCol.table = { tableName: this.table.tableName };
 
     this.service.createColumn(this.newCol).subscribe(() => {
       this.resetNewCol();
-      this.ngOnChanges(); // reload list
+      this.ngOnChanges();
     });
   }
 

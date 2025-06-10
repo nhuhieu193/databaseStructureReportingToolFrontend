@@ -4,4 +4,5 @@ export interface ColumnMetadata {
   dataType: string;
   columnSize?: number;
   nullable?: boolean;
+  table?: { tableName: string };
 }
