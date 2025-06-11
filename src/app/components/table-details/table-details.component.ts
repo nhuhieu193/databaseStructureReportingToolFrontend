@@ -1,4 +1,3 @@
-// src/app/components/table-details/table-details.component.ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableMetadata } from '../../models/table-metadata.model';
@@ -58,6 +57,7 @@ export class TableDetailsComponent implements OnInit {
     this.showAddColumnForm = true;
   }
 
+  // ✅ FIXED: dùng đúng columnId
   deleteColumn(columnId: number): void {
     const column = this.columns.find(c => c.id === columnId);
     const columnName = column ? column.columnName : 'this column';
@@ -87,18 +87,10 @@ export class TableDetailsComponent implements OnInit {
 
   getDataTypeIcon(dataType: string): string {
     const type = dataType.toLowerCase();
-    if (type.includes('varchar') || type.includes('text') || type.includes('char')) {
-      return '📝';
-    }
-    if (type.includes('int') || type.includes('number') || type.includes('decimal')) {
-      return '🔢';
-    }
-    if (type.includes('date') || type.includes('time')) {
-      return '📅';
-    }
-    if (type.includes('bool')) {
-      return '✅';
-    }
+    if (type.includes('varchar') || type.includes('text') || type.includes('char')) return '📝';
+    if (type.includes('int') || type.includes('number') || type.includes('decimal')) return '🔢';
+    if (type.includes('date') || type.includes('time')) return '📅';
+    if (type.includes('bool')) return '✅';
     return '📄';
   }
 }

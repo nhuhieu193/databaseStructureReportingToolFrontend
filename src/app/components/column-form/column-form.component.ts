@@ -1,5 +1,4 @@
-// src/app/components/column-form/column-form.component.ts
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ColumnMetadata } from '../../models/column-metadata.model';
@@ -15,10 +14,10 @@ import { ColumnMetadataService } from '../../services/column-metadata.service';
   templateUrl: './column-form.component.html',
   styleUrls: ['./column-form.component.css']
 })
-export class ColumnFormComponent implements OnInit {
+export class ColumnFormComponent implements OnInit, OnChanges {
   @Input() column: ColumnMetadata | null = null;
   @Input() tableName!: string;
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<ColumnMetadata>(); // Thay đổi: emit data thay vì void
   @Output() cancelled = new EventEmitter<void>();
 
   columnForm: FormGroup;
@@ -26,20 +25,8 @@ export class ColumnFormComponent implements OnInit {
   error: string | null = null;
 
   dataTypes = [
-    'VARCHAR',
-    'TEXT',
-    'INTEGER',
-    'BIGINT',
-    'DECIMAL',
-    'FLOAT',
-    'DOUBLE',
-    'BOOLEAN',
-    'DATE',
-    'DATETIME',
-    'TIMESTAMP',
-    'TIME',
-    'BLOB',
-    'CLOB'
+    'VARCHAR', 'TEXT', 'INTEGER', 'BIGINT', 'DECIMAL', 'FLOAT', 'DOUBLE',
+    'BOOLEAN', 'DATE', 'DATETIME', 'TIMESTAMP', 'TIME', 'BLOB', 'CLOB'
   ];
 
   constructor(
@@ -55,13 +42,18 @@ export class ColumnFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.column) {
+    // init handled by ngOnChanges
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['column'] && this.column) {
       this.columnForm.patchValue({
         columnName: this.column.columnName,
         dataType: this.column.dataType,
         columnSize: this.column.columnSize,
         nullable: this.column.nullable
       });
+      console.log('Form updated via ngOnChanges with column:', this.column);
     }
   }
 
@@ -79,7 +71,8 @@ export class ColumnFormComponent implements OnInit {
         columnName: formData.columnName,
         dataType: formData.dataType,
         columnSize: formData.columnSize || null,
-        nullable: formData.nullable
+        nullable: formData.nullable,
+        table: { tableName: this.tableName }
       };
 
       const operation = this.isEditing
@@ -87,9 +80,10 @@ export class ColumnFormComponent implements OnInit {
         : this.columnService.createColumn(columnData);
 
       operation.subscribe({
-        next: () => {
+        next: (updatedColumn) => {
           this.loading = false;
-          this.saved.emit();
+          console.log('Column saved successfully:', updatedColumn);
+          this.saved.emit(updatedColumn); // Emit data đã update
         },
         error: (error) => {
           this.loading = false;
@@ -97,6 +91,8 @@ export class ColumnFormComponent implements OnInit {
           console.error('Error saving column:', error);
         }
       });
+    } else {
+      this.markFormGroupTouched();
     }
   }
 
@@ -121,7 +117,6 @@ export class ColumnFormComponent implements OnInit {
     const dataType = this.columnForm.get('dataType')?.value;
     const sizeControl = this.columnForm.get('columnSize');
 
-    // Auto-suggest column sizes based on data type
     if (dataType === 'VARCHAR') {
       sizeControl?.setValue(255);
     } else if (dataType === 'INTEGER') {
@@ -135,5 +130,12 @@ export class ColumnFormComponent implements OnInit {
 
   needsSize(dataType: string): boolean {
     return ['VARCHAR', 'CHAR', 'DECIMAL', 'NUMERIC'].includes(dataType);
+  }
+
+  private markFormGroupTouched(): void {
+    Object.keys(this.columnForm.controls).forEach(key => {
+      const control = this.columnForm.get(key);
+      control?.markAsTouched();
+    });
   }
 }

@@ -7,7 +7,8 @@ import { ColumnMetadata } from '../models/column-metadata.model';
   providedIn: 'root'
 })
 export class ColumnMetadataService {
-  private readonly apiUrl = 'http://localhost:8080/api';
+
+  private apiUrl = 'http://localhost:8080/api';
 
   constructor(private http: HttpClient) { }
 
@@ -19,6 +20,7 @@ export class ColumnMetadataService {
     return this.http.post<ColumnMetadata>(`${this.apiUrl}/columns`, column);
   }
 
+  // Method này bị thiếu - cần thêm vào
   updateColumn(id: number, column: ColumnMetadata): Observable<ColumnMetadata> {
     return this.http.put<ColumnMetadata>(`${this.apiUrl}/columns/${id}`, column);
   }
