@@ -3,12 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ColumnFormComponent } from './components/column-form/column-form.component';
-import { TableFormComponent } from './components/table-form/table-form.component'; // ✅ ADD THIS
+import { TableFormComponent } from './components/table-form/table-form.component';
+import { TableMetadataService } from './services/table-metadata.service'; // ✅ ADD THIS
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [HttpClientModule, CommonModule, ColumnFormComponent, TableFormComponent], // ✅ ADD TableFormComponent
+  imports: [HttpClientModule, CommonModule, ColumnFormComponent, TableFormComponent],
   template: `
     <div class="app-container">
       <header class="app-header">
@@ -45,11 +46,23 @@ import { TableFormComponent } from './components/table-form/table-form.component
               <div class="panel-header">
                 <h3>Database Tables</h3>
                 <div class="panel-actions">
-                  <button class="btn btn-primary" (click)="syncMetadata()">
+                  <button class="btn btn-primary" (click)="syncMetadata()" [disabled]="loading">
                     <i class="icon-sync"></i> Sync Metadata
                   </button>
-                  <button class="btn btn-success" (click)="addTable()">
+                  <button class="btn btn-success" (click)="addTable()" [disabled]="loading">
                     <i class="icon-plus"></i> Add Table
+                  </button>
+                  <!-- ✅ NEW: Export PDF Button -->
+                  <button
+                    class="btn btn-secondary"
+                    (click)="exportToPDF()"
+                    [disabled]="isExporting || loading"
+                    title="Export database metadata to PDF">
+                    <i class="icon-file-pdf"></i>
+                    <span *ngIf="!isExporting">Export PDF</span>
+                    <span *ngIf="isExporting">
+                      <i class="icon-spinner"></i> Exporting...
+                    </span>
                   </button>
                 </div>
               </div>
@@ -152,7 +165,7 @@ import { TableFormComponent } from './components/table-form/table-form.component
         </div>
       </main>
 
-      <!-- ✅ ADD TABLE FORM OVERLAY -->
+      <!-- Table Form Overlay -->
       <div *ngIf="showAddTableForm" class="edit-form-overlay">
         <div class="edit-form-container">
           <app-table-form
@@ -162,7 +175,7 @@ import { TableFormComponent } from './components/table-form/table-form.component
         </div>
       </div>
 
-      <!-- ✅ EDIT COLUMN FORM OVERLAY -->
+      <!-- Edit Column Form Overlay -->
       <div *ngIf="showEditForm && editingColumn" class="edit-form-overlay">
         <div class="edit-form-container">
           <app-column-form
@@ -184,12 +197,18 @@ export class AppComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  // ✅ PROPERTIES FOR FORMS
+  // Properties for forms
   showAddTableForm = false;
   editingColumn: any = null;
   showEditForm = false;
 
-  constructor(private http: HttpClient) {}
+  // ✅ NEW: Export PDF property
+  isExporting = false;
+
+  constructor(
+    private http: HttpClient,
+    private tableMetadataService: TableMetadataService // ✅ ADD THIS
+  ) {}
 
   ngOnInit() {
     console.log('App initialized');
@@ -340,6 +359,25 @@ export class AppComponent implements OnInit {
           }
         });
     }
+  }
+
+  // ✅ NEW: Export PDF method
+  exportToPDF(): void {
+    this.isExporting = true;
+
+    this.tableMetadataService.exportMetadataToPDF().subscribe({
+      next: (blob: Blob) => {
+        const filename = `database-metadata-${new Date().toISOString().split('T')[0]}.pdf`;
+        this.tableMetadataService.downloadPDF(blob, filename);
+        this.isExporting = false;
+        console.log('PDF exported successfully');
+      },
+      error: (error) => {
+        console.error('Error exporting PDF:', error);
+        this.error = 'Error exporting PDF. Please try again.';
+        this.isExporting = false;
+      }
+    });
   }
 
   getColumnIcon(dataType: string): string {

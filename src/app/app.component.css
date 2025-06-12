@@ -572,3 +572,50 @@
   overflow-y: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+/* Export PDF Button Styles */
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  border: 1px solid #6c757d;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #545b62;
+  border-color: #4e555b;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Icon styles for PDF and spinner */
+.icon-file-pdf:before {
+  content: "📄"; /* or use Font Awesome class if available */
+}
+
+.icon-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+.icon-spinner:before {
+  content: "⟲"; /* or use Font Awesome spinner if available */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Panel actions layout */
+.panel-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.panel-actions .btn {
+  white-space: nowrap;
+}
