@@ -16,8 +16,8 @@ export class ColumnMetadataService {
     return this.http.get<ColumnMetadata[]>(`${this.apiUrl}/tables/${tableName}/columns`);
   }
 
-  createColumn(column: ColumnMetadata): Observable<ColumnMetadata> {
-    return this.http.post<ColumnMetadata>(`${this.apiUrl}/columns`, column);
+  createColumn(tableName: string, column: ColumnMetadata): Observable<ColumnMetadata> {
+    return this.http.post<ColumnMetadata>(`${this.apiUrl}/table-name/${tableName}`, column);
   }
 
   // Method này bị thiếu - cần thêm vào

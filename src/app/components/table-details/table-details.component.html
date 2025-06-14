@@ -2,45 +2,73 @@
 <div class="table-details-container">
   <div class="table-header">
     <div class="table-info">
-      <h3>{{ table.tableName }}</h3>
-      <p class="schema">Schema: {{ table.schemaName }}</p>
+      <h3>{{ table.tableName || 'Unknown Table' }}</h3>
+      <p class="schema" *ngIf="table.schemaName">Schema: {{ table.schemaName }}</p>
       <p class="description" *ngIf="table.description">{{ table.description }}</p>
     </div>
     <button
       class="btn btn-success btn-sm"
-      (click)="showAddColumn()">
+      (click)="showAddColumn()"
+      type="button">
+      <span class="btn-icon">➕</span>
       Add Column
     </button>
+    <div style="background: yellow; padding: 10px; margin: 10px; border: 2px solid red;">
+      <strong>🔥 DEBUG INFO:</strong><br>
+      showModal: {{ showModal }}<br>
+      table.tableName: {{ table.tableName }}<br>
+      editingColumn: {{ editingColumn }}<br>
+    </div>
+    <div *ngIf="showModal" style="position: fixed; top: 50px; left: 50px; background: red; color: white; padding: 20px; z-index: 9999;">
+      <h3>🔥 MODAL TEST!</h3>
+      <p>If you see this, the modal state is working!</p>
+      <button (click)="showModal = false">Close Test</button>
+    </div>
   </div>
 
   <!-- Error Message -->
   <div *ngIf="error" class="alert alert-danger">
+    <span class="alert-icon">⚠️</span>
     {{ error }}
-  </div>
-
-  <!-- Add/Edit Column Form -->
-  <div *ngIf="showAddColumnForm" class="form-section">
-    <app-column-form
-      [column]="editingColumn"
-      [tableName]="table.tableName"
-      (saved)="onColumnSaved()"
-      (cancelled)="hideColumnForm()">
-    </app-column-form>
   </div>
 
   <!-- Loading -->
   <div *ngIf="loading" class="loading">
-    Loading columns...
+    <div class="loading-spinner"></div>
+    <span>Loading columns...</span>
   </div>
 
   <!-- Columns List -->
-  <div *ngIf="!loading && !showAddColumnForm" class="columns-section">
-    <h4>Columns ({{ columns.length }})</h4>
-
-    <div *ngIf="columns.length === 0" class="no-columns">
-      No columns found. Click "Add Column" to create the first column.
+  <div *ngIf="!loading" class="columns-section">
+    <div class="columns-header">
+      <h4>Columns ({{ columns.length }})</h4>
+      <div class="columns-actions">
+        <button
+          class="btn btn-outline-primary btn-sm"
+          (click)="loadColumns()"
+          title="Refresh columns"
+          type="button">
+          <span class="btn-icon">🔄</span>
+          Refresh
+        </button>
+      </div>
     </div>
 
+    <!-- No columns message -->
+    <div *ngIf="columns.length === 0" class="no-columns">
+      <div class="no-columns-icon">📊</div>
+      <h5>No columns found</h5>
+      <p>This table doesn't have any columns yet.</p>
+      <button
+        class="btn btn-primary"
+        (click)="showAddColumn()"
+        type="button">
+        <span class="btn-icon">➕</span>
+        Add First Column
+      </button>
+    </div>
+
+    <!-- Columns table -->
     <div *ngIf="columns.length > 0" class="columns-table">
       <div class="table-header-row">
         <div class="col-name">Column Name</div>
@@ -50,29 +78,39 @@
         <div class="col-actions">Actions</div>
       </div>
 
-      <div
-        *ngFor="let column of columns"
-        class="table-row">
+      <div *ngFor="let column of columns; trackBy: trackByColumnId" class="table-row">
         <div class="col-name">
           <span class="type-icon">{{ getDataTypeIcon(column.dataType) }}</span>
-          {{ column.columnName }}
+          <span class="column-name">{{ column.columnName }}</span>
         </div>
-        <div class="col-type">{{ column.dataType }}</div>
-        <div class="col-size">{{ column.columnSize || '-' }}</div>
+        <div class="col-type">
+          <span class="data-type-badge">{{ column.dataType }}</span>
+        </div>
+        <div class="col-size">
+          <span class="size-value">{{ column.columnSize || '—' }}</span>
+        </div>
         <div class="col-nullable">
           <span class="nullable-badge" [class.nullable]="column.nullable">
+            <span class="badge-icon">{{ column.nullable ? '✓' : '✗' }}</span>
             {{ column.nullable ? 'Yes' : 'No' }}
           </span>
         </div>
         <div class="col-actions">
           <button
-            class="btn btn-sm btn-secondary"
-            (click)="editColumn(column)">
+            class="btn btn-sm btn-outline-secondary"
+            (click)="editColumn(column)"
+            title="Edit column"
+            type="button">
+            <span class="btn-icon">✏️</span>
             Edit
           </button>
           <button
-            class="btn btn-sm btn-danger"
-            (click)="deleteColumn(column.id!)">
+            class="btn btn-sm btn-outline-danger"
+            (click)="deleteColumn(column.id!)"
+            title="Delete column"
+            type="button"
+            *ngIf="column.id">
+            <span class="btn-icon">🗑️</span>
             Delete
           </button>
         </div>

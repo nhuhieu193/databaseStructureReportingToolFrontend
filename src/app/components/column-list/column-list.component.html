@@ -1,9 +1,23 @@
-<!-- src/app/components/column-list/column-list.component.html -->
 <div *ngIf="table" class="column-list-container">
-  <h3>Columns for {{ table.tableName }}</h3>
+  <div class="header-section">
+    <h3>Columns for {{ table.tableName }}</h3>
+    <!-- Add Column Button -->
+    <button
+      type="button"
+      class="btn btn-add-column"
+      (click)="openAddColumnModal()"
+      [disabled]="loading"
+      title="Add New Column">
+      ➕ Add Column
+    </button>
+  </div>
+
+  <!-- DEBUG showModal -->
+  <div style="background:yellow">DEBUG: showModal = {{ showModal }}</div>
 
   <!-- Loading indicator -->
   <div *ngIf="loading" class="loading-indicator">
+    <div class="spinner"></div>
     <p>Loading...</p>
   </div>
 
@@ -14,7 +28,7 @@
   </div>
 
   <!-- Table hiển thị danh sách columns -->
-  <table class="columns-table">
+  <table class="columns-table" *ngIf="columns.length > 0 && !loading">
     <thead>
     <tr>
       <th>Column Name</th>
@@ -26,17 +40,19 @@
     </thead>
     <tbody>
     <tr *ngFor="let col of columns; trackBy: trackByColumnId">
-      <td>{{ col.columnName }}</td>
       <td>
-          <span class="data-type-badge" [class]="'type-' + col.dataType.toLowerCase()">
-            {{ col.dataType }}
-          </span>
+        <span class="column-name">{{ col.columnName }}</span>
+      </td>
+      <td>
+        <span class="data-type-badge" [class]="'type-' + col.dataType.toLowerCase()">
+          {{ col.dataType }}
+        </span>
       </td>
       <td>{{ col.columnSize || '-' }}</td>
       <td>
-          <span class="nullable-indicator" [class.nullable]="col.nullable" [class.not-nullable]="!col.nullable">
-            {{ col.nullable ? 'Yes' : 'No' }}
-          </span>
+        <span class="nullable-indicator" [class.nullable]="col.nullable" [class.not-nullable]="!col.nullable">
+          {{ col.nullable ? 'Yes' : 'No' }}
+        </span>
       </td>
       <td class="actions">
         <button
@@ -57,80 +73,23 @@
         </button>
       </td>
     </tr>
-
-    <!-- Row để thêm column mới -->
-    <tr class="add-row">
-      <td>
-        <input
-          type="text"
-          [(ngModel)]="newCol.columnName"
-          placeholder="Column name"
-          class="form-input">
-      </td>
-      <td>
-        <select
-          [(ngModel)]="newCol.dataType"
-          class="form-select">
-          <option value="">Select type</option>
-          <option value="VARCHAR">VARCHAR</option>
-          <option value="TEXT">TEXT</option>
-          <option value="INTEGER">INTEGER</option>
-          <option value="BIGINT">BIGINT</option>
-          <option value="DECIMAL">DECIMAL</option>
-          <option value="FLOAT">FLOAT</option>
-          <option value="DOUBLE">DOUBLE</option>
-          <option value="BOOLEAN">BOOLEAN</option>
-          <option value="DATE">DATE</option>
-          <option value="DATETIME">DATETIME</option>
-          <option value="TIMESTAMP">TIMESTAMP</option>
-          <option value="TIME">TIME</option>
-          <option value="BLOB">BLOB</option>
-          <option value="CLOB">CLOB</option>
-        </select>
-      </td>
-      <td>
-        <input
-          type="number"
-          [(ngModel)]="newCol.columnSize"
-          placeholder="Size"
-          class="form-input size-input"
-          min="0">
-      </td>
-      <td>
-        <input
-          type="checkbox"
-          [(ngModel)]="newCol.nullable"
-          class="form-checkbox">
-      </td>
-      <td>
-        <button
-          type="button"
-          class="btn btn-add"
-          (click)="addColumn()"
-          [disabled]="!newCol.columnName.trim() || !newCol.dataType"
-          title="Add Column">
-          ➕ Add
-        </button>
-      </td>
-    </tr>
     </tbody>
   </table>
 
-  <!-- Form Edit Column - Hiển thị khi có editCol -->
-  <div *ngIf="editCol" class="edit-form-overlay">
-    <div class="edit-form-container">
-      <app-column-form
-        [column]="editCol"
-        [tableName]="table.tableName"
-        (saved)="onSaveEdit($event)"
-        (cancelled)="onCancelEdit()">
-      </app-column-form>
-    </div>
+  <!-- Empty state -->
+  <div *ngIf="columns.length === 0 && !loading && !error" class="empty-state">
+    <div class="empty-icon">📋</div>
+    <h4>No columns found</h4>
+    <p>This table doesn't have any columns yet.</p>
+    <p>Click "Add Column" to create the first column.</p>
   </div>
 
-  <!-- Empty state -->
-  <div *ngIf="columns.length === 0" class="empty-state">
-    <p>No columns found for this table.</p>
-    <p>Use the form above to add the first column.</p>
-  </div>
+  <!-- Add/Edit Column Modal (dùng cho cả add và edit) -->
+  <app-add-column-modal
+    [show]="showModal"
+    [tableName]="table.tableName"
+    [editingColumn]="editingColumn"
+    (close)="closeModal()"
+    (columnSaved)="onColumnSaved()">
+  </app-add-column-modal>
 </div>

@@ -17,7 +17,7 @@ import { ColumnMetadataService } from '../../services/column-metadata.service';
 export class ColumnFormComponent implements OnInit, OnChanges {
   @Input() column: ColumnMetadata | null = null;
   @Input() tableName!: string;
-  @Output() saved = new EventEmitter<ColumnMetadata>(); // Thay đổi: emit data thay vì void
+  @Output() saved = new EventEmitter<ColumnMetadata>();
   @Output() cancelled = new EventEmitter<void>();
 
   columnForm: FormGroup;
@@ -42,7 +42,7 @@ export class ColumnFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    // init handled by ngOnChanges
+    console.log('ColumnForm initialized with tableName:', this.tableName);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -75,24 +75,30 @@ export class ColumnFormComponent implements OnInit, OnChanges {
         table: { tableName: this.tableName }
       };
 
+      console.log('Submitting column data:', columnData);
+      console.log('Table name:', this.tableName);
+
+      // ✅ FIXED: Truyền tableName vào createColumn
       const operation = this.isEditing
         ? this.columnService.updateColumn(this.column!.id!, columnData)
-        : this.columnService.createColumn(columnData);
+        : this.columnService.createColumn(this.tableName, columnData);
 
       operation.subscribe({
         next: (updatedColumn) => {
           this.loading = false;
           console.log('Column saved successfully:', updatedColumn);
-          this.saved.emit(updatedColumn); // Emit data đã update
+          this.saved.emit(updatedColumn);
         },
         error: (error) => {
           this.loading = false;
           this.error = this.isEditing ? 'Failed to update column' : 'Failed to create column';
           console.error('Error saving column:', error);
+          console.error('Error details:', error.error);
         }
       });
     } else {
       this.markFormGroupTouched();
+      console.log('Form is invalid:', this.columnForm.errors);
     }
   }
 

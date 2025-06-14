@@ -175,14 +175,14 @@ import { TableMetadataService } from './services/table-metadata.service'; // ✅
         </div>
       </div>
 
-      <!-- Edit Column Form Overlay -->
-      <div *ngIf="showEditForm && editingColumn" class="edit-form-overlay">
+      <!-- ✅ UPDATED: Column Form Overlay for both Add and Edit -->
+      <div *ngIf="showColumnForm" class="edit-form-overlay">
         <div class="edit-form-container">
           <app-column-form
             [column]="editingColumn"
             [tableName]="selectedTable.name"
-            (saved)="onSaveEdit()"
-            (cancelled)="onCancelEdit()">
+            (saved)="onColumnSaved()"
+            (cancelled)="onColumnFormCancel()">
           </app-column-form>
         </div>
       </div>
@@ -199,8 +199,10 @@ export class AppComponent implements OnInit {
 
   // Properties for forms
   showAddTableForm = false;
+
+  // ✅ UPDATED: Single form for both add and edit column
+  showColumnForm = false;
   editingColumn: any = null;
-  showEditForm = false;
 
   // ✅ NEW: Export PDF property
   isExporting = false;
@@ -308,10 +310,14 @@ export class AppComponent implements OnInit {
     }
   }
 
+  // ✅ UPDATED: Add Column method
   addColumn() {
     console.log('Opening add column form...');
+    this.editingColumn = null; // No existing column data for new column
+    this.showColumnForm = true;
   }
 
+  // ✅ UPDATED: Edit Column method
   editColumn(column: any) {
     console.log('Opening edit column form for:', column.name);
 
@@ -324,17 +330,21 @@ export class AppComponent implements OnInit {
       table: { tableName: this.selectedTable.name }
     };
 
-    this.showEditForm = true;
+    this.showColumnForm = true;
   }
 
-  onSaveEdit() {
-    this.showEditForm = false;
+  // ✅ NEW: Column form saved handler
+  onColumnSaved() {
+    console.log('Column saved successfully');
+    this.showColumnForm = false;
     this.editingColumn = null;
-    this.loadTables();
+    this.loadTables(); // Reload to get updated data
   }
 
-  onCancelEdit() {
-    this.showEditForm = false;
+  // ✅ NEW: Column form cancel handler
+  onColumnFormCancel() {
+    console.log('Column form cancelled');
+    this.showColumnForm = false;
     this.editingColumn = null;
   }
 
